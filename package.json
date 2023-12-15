@@ -1,0 +1,23 @@
+{
+  "name": "node-red-dashboard-2-ff-auth",
+  "version": "1.0.0",
+  "description": "A Node-RED Plugin to extend Node-RED Dashboard 2.0 with user session data on SocketIO events",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+      "type": "git",
+      "url": "https://github.com/FlowFuse/node-red-dashboard-ff-auth.git"
+  },
+  "author": {
+      "name": "Joe Pavitt",
+      "url": "https://github.com/joepavitt"
+  },
+  "node-red": {
+    "plugins": {
+        "node-red-dashboard-2-ff-auth": "index.js"
+    }
+  },
+  "license": "Apache-2.0"
+}
