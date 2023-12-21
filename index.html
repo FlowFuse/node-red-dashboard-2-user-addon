@@ -1,0 +1,139 @@
+<style>
+    #node-config-stateless-nodes {
+        flex-grow: 1;
+        width: 100%;
+    }
+    #node-config-stateless-nodes-container {
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+    }
+</style>
+
+<script type="text/javascript">
+    (function () {
+        function recordEvents (events) {
+            if (events.length === 0) { return } // nothing to record
+
+            // note the state of the editor before pushing to history
+            const isDirty = RED.nodes.dirty()
+            if (RED._db2debug) { console.log('recordEvents', isDirty, events) }
+
+            // add our changes to NR history and trigger whether or not we need to redeploy
+            RED.history.push({
+                t: 'multi',
+                events,
+                dirty: isDirty
+            })
+            RED.nodes.dirty(true)
+            RED.view.redraw()
+        }
+
+        RED.plugins.registerPlugin('node-red-dashboard-2-ff-auth', {
+            type: 'node-red-dashboard-2',
+            tabs: [
+                {
+                    id: 'ff-auth',
+                    label: 'FF Auth',
+                    init (base, parent) {
+                        const html = `<div class="nrdb2-sidebar-tab-content">
+        <div class="form-row form-row-flex">
+            <input type="checkbox" id="node-config-input-includeClientData">
+            <label style="width:auto" for="node-config-input-includeClientData"><i class="fa fa-id-card-o" style="margin-right:4px;"></i>Include Client Data</label>
+        </div>
+        <p class="nrdb2-helptext" style="margin-top: -12px;">
+            <i class="fa fa-info-circle"></i> This option includes client data in all messages transmitted by Dashboard 2.0 (e.g. Socket ID and information about any logged in user)
+        </p>
+        <div id="node-config-stateless-nodes-container" class="form-row">
+            <label style="display: block; width: auto;"><i class="fa fa-id-card-o" style="margin-right:4px;"></i>Accept Client Constraints</label>
+            <p class="nrdb2-helptext" style="margin-top: -4px;">
+                <i class="fa fa-info-circle"></i> Defines whether the respective node type will use client data (e.g. socketid), and constrain communications to just that client.
+            </p>
+            <div id="node-config-stateless-nodes"></div>
+        </div></div>`
+                        // given a jQuery container/parent, create the content for this tab
+                        parent.append(html)
+
+                        // set initial state
+                        $('#node-config-input-includeClientData')
+                            .prop('checked', base.includeClientData)
+
+                        // add event handler to our checkbox for including client data
+                        $('#node-config-input-includeClientData')
+                            .on('change', function (event) {
+                                const value = event.target.checked
+                                base.includeClientData = value
+                                // store hte previous value in history
+                                const events = [{
+                                    t: 'edit',
+                                    node: base,
+                                    changes: {
+                                        includeClientData: !value
+                                    },
+                                    dirty: true,
+                                    changed: true
+                                }]
+                                recordEvents(events)
+                            })
+
+
+                        // build list of node types
+                        const widgets = RED.nodes.registry.getNodeTypes().filter((nodeType) => {
+                            const type = RED.nodes.getType(nodeType)
+                            return /^ui-/.test(nodeType) && type.category !== 'config' && type.inputs > 0
+                        })
+                        
+                        treeList = $('#node-config-stateless-nodes')
+                            .treeList({
+                                data: widgets.map((w) => {
+                                    const isSelected = base.acceptsClientConfig?.includes(w)
+                                    return {
+                                        label: w,
+                                        checkbox: true,
+                                        selected: isSelected
+                                    }
+                                })
+                            })
+                            .on('treelistselect', function (event, node) {
+                                const events = [{
+                                    t: 'edit',
+                                    node: base,
+                                    changes: {
+                                        acceptsClientConfig: [...base.acceptsClientConfig]
+                                    },
+                                    dirty: true,
+                                    changed: true
+                                }]
+                                let changed = false
+                                if (!node.selected && base.acceptsClientConfig?.includes(node.label)) {
+                                    // remove it from the list
+                                    base.acceptsClientConfig = base.acceptsClientConfig.filter((w) => w !== node.label)
+                                    changed = true
+                                } else if (node.selected && !base.acceptsClientConfig?.includes(node.label)) {
+                                    // add it to the list
+                                    base.acceptsClientConfig.push(node.label)
+                                    changed = true
+                                }
+                                if (changed) {
+                                    recordEvents(events)
+                                }
+                            })
+                        
+                        // resize content
+                        // let elementsHeight = 0
+                        // $('#ff-node-red-dashboard').children().each(function (i) {
+                        //     const child = $(this)
+                        //     if (child.attr('id') !== 'node-config-stateless-nodes-container') {
+                        //         console.log(child.attr('class'), child.height())
+                        //         elementsHeight += child.height()
+                        //     }
+                        // })
+
+                        // const listHeight = $('#ff-node-red-dashboard').height() - elementsHeight
+                        // $('#dashboard-2-ff-auth').height(listHeight)
+                    }
+                }
+            ]
+        })
+    })()
+</script>
