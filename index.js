@@ -2,7 +2,7 @@ module.exports = (RED) => {
     RED.plugins.registerPlugin('node-red-dashboard-2-ff-auth', {
         type: 'node-red-dashboard-2',
         hooks: {
-            onSetup: (RED, config, req, res) => {
+            onSetup: (config, req, res) => {
                 return {
                     socketio: {
                         path: `${config.path}/socket.io`,
@@ -13,13 +13,28 @@ module.exports = (RED) => {
                     }
                 }
             },
-            onAction: (conn, id, msg) => {
-                msg._user = conn.handshake.auth.user
+            onAddConnectionCredentials (conn, msg) {
+                if (!msg._client) {
+                    msg._client = {}
+                }
+                msg._client = { ...msg._client, ...{ user: conn.handshake.auth.user } }
                 return msg
             },
-            onChange: (conn, id, msg) => {
-                msg._user = conn.handshake.auth.user
-                return msg
+            onIsValidConnection (conn, msg) {
+                // check if the msg contains a specified user
+                // if it does, does that user match the user in the connection?
+                if (msg._client?.user) {
+                    return msg._client.user.userId === conn.handshake.auth?.user?.userId
+                }
+                return true
+            },
+            onCanSaveInStore (msg) {
+                // check if the msg contains a specified user
+                // if it does, then we can't save in general data store
+                if (msg._client?.user) {
+                    return false
+                }
+                return true
             }
         }
     })
