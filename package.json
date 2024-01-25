@@ -1,5 +1,5 @@
 {
-  "name": "@flowfuse/node-red-dashboard-2-ff-auth",
+  "name": "@flowfuse/node-red-dashboard-2-user-addon",
   "version": "1.0.0",
   "description": "A Node-RED Plugin to extend Node-RED Dashboard 2.0 with user session data on SocketIO events",
   "main": "index.js",
