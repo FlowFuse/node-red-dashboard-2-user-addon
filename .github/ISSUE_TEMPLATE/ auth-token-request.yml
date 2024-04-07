@@ -1,0 +1,45 @@
+name: Auth Token Request
+description: Request an authentication token for npmjs access.
+title: "AuthToken Request for ..."
+assignees: 
+  - hardillb
+body:
+  - type: markdown
+    attributes:
+      value: "## Auth Token Request\nPlease fill out this form to request an authentication token."
+
+  - type: input
+    id: customer-hubspot-link
+    attributes:
+      label: Customer HubSpot Link
+      description: "Please provide the link to the customer's HubSpot profile."
+      placeholder: "https://app.hubspot.com/contacts/..."
+    validations:
+      required: true
+
+  - type: input
+    id: expiry-date
+    attributes:
+      label: Expiry Date (Optional)
+      description: "Specify the expiry date for the token if applicable (YYYY-MM-DD). Leave blank for no expiry."
+      placeholder: "YYYY-MM-DD"
+
+  - type: input
+    id: ip-address
+    attributes:
+      label: IP Address Restriction (Optional)
+      description: "Specify any IP address restrictions for this token. Leave blank if unrestricted."
+      placeholder: "192.168.1.1"
+
+  - type: markdown
+    attributes:
+      value: "### Additional Information\nPlease provide any other information or requirements related to your request."
+
+  - type: textarea
+    id: additional-info
+    attributes:
+      label: Additional Information (Optional)
+      description: "Any other details or context you'd like to provide about your auth token request."
+      placeholder: "Additional details..."
+    validations:
+      required: false
