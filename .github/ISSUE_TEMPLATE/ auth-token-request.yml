@@ -20,7 +20,7 @@ body:
   - type: input
     id: expiry-date
     attributes:
-      label: Expiry Date (Optional)
+      label: Expiry Date (Required, should match the end of the their license)
       description: "Specify the expiry date for the token if applicable (YYYY-MM-DD). Leave blank for no expiry."
       placeholder: "YYYY-MM-DD"
 
